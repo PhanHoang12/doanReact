@@ -13,6 +13,8 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
+import Member from './component/member';
+import Home from './component/Home/Home';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -22,8 +24,10 @@ root.render(
       <App>
       <Routes>
         {/* <Route index path="/" element={<}/> */}
+        <Route path='/' element={<Home/>}/>
         <Route path="/blog" element={<Blog />}/>
         <Route path="/blog/detail/:id" element={<BlogDetail />}/>
+        <Route path="/member/login-register" element={<Member/>}/>
       </Routes>
       </App>
     </Router>

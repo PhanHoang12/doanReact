@@ -1,6 +1,32 @@
-import React from 'react'
+import {React,useState,useEffect} from 'react'
+import { useNavigate, NavLink, useLocation } from 'react-router-dom'
 
 const Head = () => {
+	 const navigate = useNavigate();
+	 const location = useLocation();
+	 const [isLogin, setIsLogin] = useState(false)
+	 useEffect(()=>{
+		const token = localStorage.getItem("token")
+		if(token){
+			setIsLogin(true)
+		} else{
+			setIsLogin(false)
+		}
+	 },[location.pathname]);
+	 const handleLogout = () =>{
+		localStorage.clear();
+		setIsLogin(false);
+		navigate("/member/login-register");
+
+	 }
+	//  const handleAccount = () =>{
+	// 	const token = localStorage.getItem("token");
+	// 	if(!token){
+	// 		navigate("/member/login-register");
+	// 	} else {
+	// 		console.log("Đã login thành công!")
+	// 	}
+	//  }
   return (
       <header id="header">
 		<div className="header_top">
@@ -63,11 +89,31 @@ const Head = () => {
 					<div className="col-md-8 clearfix">
 						<div className="shop-menu clearfix pull-right">
 							<ul className="nav navbar-nav">
-								<li><a href=""><i className="fa fa-user"></i> Account</a></li>
+								{/* <li><a href=""><i className="fa fa-user"></i> Account</a></li>
 								<li><a href=""><i className="fa fa-star"></i> Wishlist</a></li>
 								<li><a href="checkout.html"><i className="fa fa-crosshairs"></i> Checkout</a></li>
 								<li><a href="cart.html"><i className="fa fa-shopping-cart"></i> Cart</a></li>
-								<li><a href="login.html"><i className="fa fa-lock"></i> Login</a></li>
+								<li><a href="login.html"><i className="fa fa-lock"></i> Login</a></li> */}
+								{isLogin ? (
+									<div>
+									<li><a href="#"><i className="fa fa-user"></i> Account</a></li>
+									<li><a href=""><i className="fa fa-star"></i> Wishlist</a></li>
+									<li><a href="checkout.html"><i className="fa fa-crosshairs"></i> Checkout</a></li>
+									<li><a href="cart.html"><i className="fa fa-shopping-cart"></i> Cart</a></li>
+									<li>
+										<a href="#" onClick={handleLogout}>
+											<i className="fa fa-lock"></i> Logout
+										</a>
+									</li>
+									</div>
+								):(
+									<li>
+										<NavLink to="/member/login-register">
+											<i className="fa fa-lock"></i> Login
+										</NavLink>
+									</li>
+								)}
+								
 							</ul>
 						</div>
 					</div>
@@ -101,7 +147,10 @@ const Head = () => {
                                 </li> 
 								<li className="dropdown"><a href="#">Blog<i className="fa fa-angle-down"></i></a>
                                     <ul role="menu" className="sub-menu">
-                                        <li><a href="blog.html">Blog List</a></li>
+                                        <li>
+											{/* <a href="blog.html">Blog List</a> */}
+											 <NavLink to="/blog">Blog List</NavLink>
+											</li>
 										<li><a href="blog-single.html">Blog Single</a></li>
                                     </ul>
                                 </li> 
