@@ -74,10 +74,11 @@ const BlogDetail = () => {
                 </div>
             </div>
 
+            {/* em tách CommentSection để xử lí phần comment cho file dễ đọc  */}
+
             <CommentSection
                 blogId={params.id}
                 initialComments={data.comment || []}/>
-
         </div>
     );
 };

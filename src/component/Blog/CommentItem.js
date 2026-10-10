@@ -10,7 +10,7 @@ const CommentItem = ({
     handleChangeComment,
     handleComment
 }) => {
-    const date = new Date(item.created_at);
+    const date = item.created_at ? new Date(item.created_at): null;
 
     return (
         <li className="media">
@@ -18,12 +18,9 @@ const CommentItem = ({
                 <img
                     className="media-object"
                     src={`http://localhost/laravel8/public/upload/user/avatar/${item.image_user}`}
-                    alt=""
-                />
+                    alt=""/>
             </a>
-
             <div className="media-body">
-
                 <ul className="sinlge-post-meta">
                     <li>
                         <i className="fa fa-user"></i>
@@ -52,8 +49,7 @@ const CommentItem = ({
                     onClick={(e) => {
                         e.preventDefault();
                         handleReply(item.id);
-                    }}
-                >
+                    }}>
                     <i className="fa fa-reply"></i>
                     Reply
                 </a>
@@ -64,47 +60,35 @@ const CommentItem = ({
                             rows="5"
                             value={comment}
                             onChange={handleChangeComment}
-                            placeholder={`Reply ${item.name_user}`}
-                        />
-
+                            placeholder={`Reply ${item.name_user}`}/>
                         <p>{errorCmt}</p>
-
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                        >
+                            className="btn btn-primary">
                             Post Reply
                         </button>
                     </form>
                 )}
-
                 {replies.map(reply => {
                     const replyDate =
                         new Date(reply.created_at);
-
                     return (
                         <div
                             key={reply.id}
-                            className="media second-media"
-                        >
+                            className="media second-media">
                             <a
-                                className="pull-left"
-                                href="#"
-                            >
+                                className="pull-left">
                                 <img
                                     className="media-object"
                                     src={`http://localhost/laravel8/public/upload/user/avatar/${reply.image_user}`}
-                                    alt=""
-                                />
+                                    alt=""/>
                             </a>
-
                             <div className="media-body">
                                 <ul className="sinlge-post-meta">
                                     <li>
                                         <i className="fa fa-user"></i>
                                         {reply.name_user}
                                     </li>
-
                                     <li>
                                         <i className="fa fa-clock-o"></i>
                                         {replyDate.toLocaleTimeString(
@@ -115,21 +99,17 @@ const CommentItem = ({
                                             }
                                         )}
                                     </li>
-
                                     <li>
                                         <i className="fa fa-calendar"></i>
                                         {replyDate.toLocaleDateString(
-                                            "vi-VN"
-                                        )}
+                                            "vi-VN")}
                                     </li>
                                 </ul>
-
                                 <p>{reply.comment}</p>
                             </div>
                         </div>
                     );
                 })}
-
             </div>
         </li>
     );

@@ -128,15 +128,13 @@ const CommentSection = ({ blogId, initialComments }) => {
                                     rows="11"
                                     value={comment}
                                     onFocus={() => setIdComment(0)}
-                                    onChange={handleChangeComment}
-                                />
+                                    onChange={handleChangeComment}/>
 
                                 <p>{errorCmt}</p>
 
                                 <button
                                     type="submit"
-                                    className="btn btn-primary"
-                                >
+                                    className="btn btn-primary">
                                     Post Comment
                                 </button>
 
