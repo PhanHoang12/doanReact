@@ -1,6 +1,15 @@
 import React from 'react'
+import { useLocation } from 'react-router-dom';
 
 const MenuLeft = () => {
+	  const location = useLocation();
+
+    if (
+        location.pathname === "/account" ||
+        location.pathname === "/my-product"
+    ) {
+        return null;
+    }
   return (
     <div className="col-sm-3">
 					<div className="left-sidebar">

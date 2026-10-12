@@ -96,7 +96,9 @@ const Head = () => {
 								<li><a href="login.html"><i className="fa fa-lock"></i> Login</a></li> */}
 								{isLogin ? (
 									<div>
-									<li><a href="#"><i className="fa fa-user"></i> Account</a></li>
+									<li>
+										<NavLink to="/account"><i className="fa fa-user"></i>
+										</NavLink> Account</li>
 									<li><a href=""><i className="fa fa-star"></i> Wishlist</a></li>
 									<li><a href="checkout.html"><i className="fa fa-crosshairs"></i> Checkout</a></li>
 									<li><a href="cart.html"><i className="fa fa-shopping-cart"></i> Cart</a></li>

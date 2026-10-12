@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import API from '../../api/API';
 import CommentSection from './CommentSection';
+import Rate from './Rate';
 
 const BlogDetail = () => {
     const [data, setData] = useState({});
     const params = useParams();
+    const[countRate, setCountRate] = useState(0);
 
     useEffect(() => {
         API.get("/blog/detail/" + params.id)
@@ -73,6 +75,27 @@ const BlogDetail = () => {
                     />
                 </div>
             </div>
+            <div className="rating-area">
+						<ul className="ratings">
+							<li className="rate-this">Rate this item:</li>
+							<li>
+								{/* <i className="fa fa-star color"></i>
+								<i className="fa fa-star color"></i>
+								<i className="fa fa-star color"></i>
+								<i className="fa fa-star"></i>
+								<i className="fa fa-star"></i> */}
+                                <Rate setCountRate={setCountRate}/>
+							</li>
+							<li className="color">({countRate} votes)</li>
+						</ul>
+						<ul className="tag">
+							<li>TAG:</li>
+							<li><a className="color" href="">Pink <span>/</span></a></li>
+							<li><a className="color" href="">T-Shirt <span>/</span></a></li>
+							<li><a className="color" href="">Girls</a></li>
+						</ul>
+					</div>
+
 
             {/* em tách CommentSection để xử lí phần comment cho file dễ đọc  */}
 

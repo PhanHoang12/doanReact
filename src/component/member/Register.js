@@ -96,6 +96,12 @@ const Register = () => {
             };
             API.post("/register",data).then(res=>{
                 console.log(res.data)
+                if(res.data.error){
+                    setErrors(res.data.error);
+                } else{
+                    setErrors({});
+                    alert("Đăng ký thành công!")
+                }
             }).catch(error =>{
                 console.log("Lỗi gọi API", error);
                 if (error.response) {

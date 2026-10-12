@@ -49,7 +49,11 @@ const Login = () => {
             };
             API.post("/login",data).then(res =>{
                 console.log(res.data);
-                if(res.data.success){
+                if(res.data.error){
+                    setErrors(res.data.error)
+
+                } else if(res.data.success){
+                    setErrors({});
                     localStorage.setItem("auth", JSON.stringify(res.data.Auth));
                     localStorage.setItem("token", res.data.token);
                     navigate("/")

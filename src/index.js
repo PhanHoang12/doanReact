@@ -15,6 +15,8 @@ import {
 } from 'react-router-dom';
 import Member from './component/member';
 import Home from './component/Home/Home';
+import Account from './component/member/Account';
+import MyProduct from './component/Product/MyProduct';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -28,6 +30,8 @@ root.render(
         <Route path="/blog" element={<Blog />}/>
         <Route path="/blog/detail/:id" element={<BlogDetail />}/>
         <Route path="/member/login-register" element={<Member/>}/>
+        <Route path='/account' element={<Account/>}/>
+        <Route path='/my-product' element={<MyProduct/>}/>
       </Routes>
       </App>
     </Router>
