@@ -17,6 +17,7 @@ import Member from './component/member';
 import Home from './component/Home/Home';
 import Account from './component/member/Account';
 import MyProduct from './component/Product/MyProduct';
+import AddProduct from './component/Product/AddProduct';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -32,6 +33,7 @@ root.render(
         <Route path="/member/login-register" element={<Member/>}/>
         <Route path='/account' element={<Account/>}/>
         <Route path='/my-product' element={<MyProduct/>}/>
+        <Route path='/user/product/add' element={<AddProduct/>}/>
       </Routes>
       </App>
     </Router>

@@ -1,11 +1,12 @@
 import React,{useState,useEffect} from 'react'
 import API from '../../api/API'
 import MemberLeft from '../member/MemberLeft';
+import { NavLink } from 'react-router-dom';
 const MyProduct = () => {
     const[products, setProducts] = useState([]);
     const auth = JSON.parse(localStorage.getItem("auth"))
-    const token = localStorage.getItem("token")
     useEffect(()=>{
+      const token = localStorage.getItem("token")
         // console.log("User login is:",auth)
         const config = {
           headers:{
@@ -15,6 +16,7 @@ const MyProduct = () => {
         };
         API.get("/user/my-product", config).then(res=>{
           console.log("Sản phẩm:" ,res.data);
+          setProducts(Object.values(res.data.data))
         }).catch(error =>{
           console.log("Lỗi lấy product:", error)
           if(error.response){
@@ -53,13 +55,25 @@ const MyProduct = () => {
                                 </td>
                                 <td>{item.price}</td>
                                 <td>
-                                    Edit | Delete
-                                </td>
+                                  <a href="#" className="btn btn-link">
+                                      <i className="fa fa-edit"></i>
+                                  </a>
+                                  <a href="#" className="btn btn-link">
+                                      <i className="fa fa-times"></i>
+                                  </a>
+                              </td>
                             </tr>
                         );
                     })}
                 </tbody>
             </table>
+            <div className="text-right">
+              <NavLink
+                  to="/user/product/add"
+                  className="btn btn-primary">
+                  Add New
+              </NavLink>
+          </div>
     </div>
     </>
   )
