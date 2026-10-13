@@ -28,7 +28,7 @@ const MyProduct = () => {
     <>
     <MemberLeft/>
     <div className='col-sm-9'>
-      <h2>My Product</h2>
+      <h2 className='title text-center'>My Product</h2>
        <table className="table table-bordered">
                 <thead>
                     <tr>
@@ -55,9 +55,9 @@ const MyProduct = () => {
                                 </td>
                                 <td>{item.price}</td>
                                 <td>
-                                  <a href="#" className="btn btn-link">
+                                  <NavLink  to={`/user/product/edit/${item.id}`}>
                                       <i className="fa fa-edit"></i>
-                                  </a>
+                                  </NavLink>
                                   <a href="#" className="btn btn-link">
                                       <i className="fa fa-times"></i>
                                   </a>

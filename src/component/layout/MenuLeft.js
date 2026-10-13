@@ -7,6 +7,7 @@ const MenuLeft = () => {
     if (
         location.pathname === "/account" ||
         location.pathname === "/my-product" || location.pathname === "/user/product/add"
+		|| location.pathname.startsWith("/user/product/edit/")
     ) {
         return null;
     }

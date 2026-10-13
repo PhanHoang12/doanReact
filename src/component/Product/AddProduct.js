@@ -185,8 +185,8 @@ const AddProduct = () => {
     <>
       <MemberLeft/>
       <div className='col-sm-9'>
+        <h2 className='title text-center'>Create Product</h2>
         <div className='signup-form'>
-            <h2>Create Product</h2>
             <form onSubmit={handleSubmit}>
                 <ul>
                     {renderError()}
