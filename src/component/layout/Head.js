@@ -1,10 +1,12 @@
-import {React,useState,useEffect} from 'react'
+import React,{useState,useEffect, useContext} from 'react'
 import { useNavigate, NavLink, useLocation } from 'react-router-dom'
+import { CartContext } from '../../context/CartContext';
 
 const Head = () => {
 	 const navigate = useNavigate();
 	 const location = useLocation();
 	 const [isLogin, setIsLogin] = useState(false)
+	 const { cartCount, setCartCount } = useContext(CartContext);
 	 useEffect(()=>{
 		const token = localStorage.getItem("token")
 		if(token){
@@ -13,8 +15,11 @@ const Head = () => {
 			setIsLogin(false)
 		}
 	 },[location.pathname]);
+
+
 	 const handleLogout = () =>{
 		localStorage.clear();
+		setCartCount(0);
 		setIsLogin(false);
 		navigate("/member/login-register");
 
@@ -101,7 +106,12 @@ const Head = () => {
 										</NavLink> Account</li>
 									<li><a href=""><i className="fa fa-star"></i> Wishlist</a></li>
 									<li><a href="checkout.html"><i className="fa fa-crosshairs"></i> Checkout</a></li>
-									<li><a href="cart.html"><i className="fa fa-shopping-cart"></i> Cart</a></li>
+									<li>
+										<NavLink to="/product/cart">
+											<i className="fa fa-shopping-cart"></i>
+											Cart ({cartCount})
+										</NavLink>
+									</li>
 									<li>
 										<a href="#" onClick={handleLogout}>
 											<i className="fa fa-lock"></i> Logout
@@ -143,7 +153,10 @@ const Head = () => {
                                         <li><a href="shop.html">Products</a></li>
 										<li><a href="product-details.html">Product Details</a></li> 
 										<li><a href="checkout.html">Checkout</a></li> 
-										<li><a href="cart.html">Cart</a></li> 
+										<NavLink to="/product/cart">
+											<i className="fa fa-shopping-cart"></i>
+											Cart ({cartCount})
+										</NavLink>
 										<li><a href="login.html">Login</a></li> 
                                     </ul>
                                 </li> 

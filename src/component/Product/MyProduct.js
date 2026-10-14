@@ -24,6 +24,32 @@ const MyProduct = () => {
           }
         })
     },[])
+    const handleDelete = (id) =>{
+      const confirmDelete = window.confirm(
+      "Bạn có chắc muốn xóa sản phẩm này không?"
+      );
+      if (!confirmDelete) {
+          return;
+      }
+        const token = localStorage.getItem("token")
+        const config = {
+            headers:{
+                Authorization: "Bearer " +token,
+                Accept: "application/json"
+            }
+        };
+        API.get("/user/product/delete/" + id, config).then(res=>{
+            console.log("Delete product: ", res.data);
+            const danhSach = Object.values(res.data.data)
+            setProducts(danhSach)
+            alert("Xóa thành công sản phẩm có id = "+ id)
+        }).catch(error =>{
+          console.log("lỗi xóa sản phẩm:", error)
+          if(error.response){
+            console.log(error.response.data);
+          }
+        })
+    }
   return (
     <>
     <MemberLeft/>
@@ -55,10 +81,14 @@ const MyProduct = () => {
                                 </td>
                                 <td>{item.price}</td>
                                 <td>
-                                  <NavLink  to={`/user/product/edit/${item.id}`}>
+                                  <NavLink  to={`/user/product/edit/${item.id}`} className="btn btn-link">
                                       <i className="fa fa-edit"></i>
                                   </NavLink>
-                                  <a href="#" className="btn btn-link">
+                                  <a href="#" onClick={(e) =>{
+                                    e.preventDefault();
+                                    handleDelete(item.id);
+                                  }}
+                                   className="btn btn-link">
                                       <i className="fa fa-times"></i>
                                   </a>
                               </td>

@@ -19,12 +19,16 @@ import Account from './component/member/Account';
 import MyProduct from './component/Product/MyProduct';
 import AddProduct from './component/Product/AddProduct';
 import EditProduct from './component/Product/EditProduct ';
+import ProductDetail from './component/Product/ProductDetail';
+import Cart from './component/Product/Cart';
+import CartProvider from './context/CartContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
     <Router>
+      <CartProvider>
       <App>
       <Routes>
         {/* <Route index path="/" element={<}/> */}
@@ -36,8 +40,11 @@ root.render(
         <Route path='/my-product' element={<MyProduct/>}/>
         <Route path='/user/product/add' element={<AddProduct/>}/>
         <Route path='/user/product/edit/:id' element={<EditProduct/>}/>
+        <Route path='/product/detail/:id' element={<ProductDetail/>}/>
+        <Route path='/product/cart' element={<Cart/>}/>
       </Routes>
       </App>
+      </CartProvider>
     </Router>
   </React.StrictMode>
 );

@@ -7,12 +7,12 @@ const MenuLeft = () => {
     if (
         location.pathname === "/account" ||
         location.pathname === "/my-product" || location.pathname === "/user/product/add"
-		|| location.pathname.startsWith("/user/product/edit/")
+		|| location.pathname.startsWith("/user/product/edit/") || location.pathname === "/product/cart"
     ) {
         return null;
     }
-  return (
-    <div className="col-sm-3">
+  		return (
+    			<div className="col-sm-3">
 					<div className="left-sidebar">
 						<h2>Category</h2>
 						<div className="panel-group category-products" id="accordian">
@@ -152,7 +152,7 @@ const MenuLeft = () => {
 					</div>
 				</div>
 
-  )
+  	)
 }
 
 export default MenuLeft
