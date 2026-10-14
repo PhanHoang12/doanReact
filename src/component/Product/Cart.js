@@ -4,6 +4,7 @@ import { CartContext } from '../../context/CartContext';
 const Cart = () => {
     const { setCartCount } = useContext(CartContext);
     const[products,setProducts] = useState([]);
+    const[cart,setCart] = useState(JSON.parse(localStorage.getItem("Cart")) ||{})
     useEffect(() =>{
         const cart = JSON.parse(localStorage.getItem("Cart")) || {};
         console.log("Cart:", cart)
@@ -18,13 +19,13 @@ const Cart = () => {
         });
     },[]);
     const handleQuantity = (id,type) =>{
-        const cart = JSON.parse(localStorage.getItem("Cart")) || {};
+        const newCart = {...cart}
         if(type === "cong"){
-            cart[id] = cart[id] +1
+            newCart[id] = newCart[id] +1
         } 
         if(type ==="tru"){
-            if(cart[id] > 1){
-                cart[id] = cart[id] -1;
+            if(newCart[id] > 1){
+                newCart[id] = newCart[id] -1;
             }
         }
         if(type==="xoa"){
@@ -33,27 +34,24 @@ const Cart = () => {
                 return;
             }
 
-            delete cart[id];
+            delete newCart[id];
             // dùng lọc để lọc bỏ id bấm xóa ra khỏi bảng ví dụ xóa id =2; thì 2!==1 true giữ lại, 2!==2 sai nên bỏ đi..
             setProducts(products.filter((item) => item.id !== id))
-        } else {
-            setProducts([...products]);
         }
+            setCart(newCart);
 
-        localStorage.setItem("Cart", JSON.stringify(cart));
+        localStorage.setItem("Cart", JSON.stringify(newCart));
 
 
         let totalQuantity = 0;
-        Object.values(cart).forEach((quantity) => {
-        totalQuantity = totalQuantity + Number(quantity);
-        
+        Object.values(newCart).forEach((quantity) => {
+        totalQuantity = totalQuantity + Number(quantity); 
     });
         setCartCount(totalQuantity);
 
     }
     let tongCuoi = 0;
     products.forEach((item) =>{
-        const cart = JSON.parse(localStorage.getItem("Cart"))||{};
         const quantity = cart[item.id] || 0;
         tongCuoi = tongCuoi + (item.price * quantity);
     })
@@ -84,7 +82,6 @@ const Cart = () => {
                         </thead>
                         <tbody>
                             {products.map((item) => {
-                                const cart = JSON.parse(localStorage.getItem("Cart")) || {};
                                 const quantity = cart[item.id] || 0;
                                 const images = Array.isArray(item.image)
                                     ? item.image
@@ -174,7 +171,7 @@ const Cart = () => {
                                             <li>Cart sub total <span>${tongCuoi}</span></li>
                                             <li>Eco Tax <span>$2</span></li>
                                             <li>Shipping Cost <span>Free</span></li>
-                                            <li>Total <span>{tongCuoi}</span></li>
+                                            <li>Total <span>${tongCuoi}</span></li>
                                         </ul>
                                     </div>
                                 </div>
