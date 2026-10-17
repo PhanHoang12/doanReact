@@ -22,6 +22,11 @@ import EditProduct from './component/Product/EditProduct ';
 import ProductDetail from './component/Product/ProductDetail';
 import Cart from './component/Product/Cart';
 import CartProvider from './context/CartContext';
+import WishlishProvider from './context/WishlistContext';
+import Wishlist from './component/Product/Wishlist';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+import Checkout from './component/Product/Checkout';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -29,6 +34,8 @@ root.render(
   <React.StrictMode>
     <Router>
       <CartProvider>
+        <WishlishProvider>
+        <Provider store={store}>
       <App>
       <Routes>
         {/* <Route index path="/" element={<}/> */}
@@ -42,8 +49,12 @@ root.render(
         <Route path='/user/product/edit/:id' element={<EditProduct/>}/>
         <Route path='/product/detail/:id' element={<ProductDetail/>}/>
         <Route path='/product/cart' element={<Cart/>}/>
+        <Route path='/wishlist' element={<Wishlist/>}/>
+        <Route path='/checkout' element={<Checkout/>}/>
       </Routes>
       </App>
+      </Provider>
+      </WishlishProvider>
       </CartProvider>
     </Router>
   </React.StrictMode>

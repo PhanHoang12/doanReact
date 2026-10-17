@@ -1,9 +1,24 @@
-import React,{useState, useEffect} from 'react'
+import React,{useState, useEffect,useContext} from 'react'
 import API from '../../api/API'
 import { useNavigate, NavLink } from 'react-router-dom';
+import { WishlistContext } from '../../context/WishlistContext';
+
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../redux/cartSlice";
+
 const Home = () => {
   const[products, setProducts] = useState([]);
   const navigate = useNavigate();
+  const {setWishlistCount} = useContext(WishlistContext);
+  const handleWishlish = (id) =>{
+      const wishList = JSON.parse(localStorage.getItem("Wishlist")) || [];
+      if(!wishList.includes(id)){
+        wishList.push(id);
+      }
+      localStorage.setItem("Wishlist", JSON.stringify(wishList));
+      setWishlistCount(wishList.length);
+      console.log("wishList:", wishList)
+  }
   useEffect(() =>{
     API.get("/product").then(res=>{
       console.log('All product: ', res.data);
@@ -16,6 +31,7 @@ const Home = () => {
       }
     })
   },[])
+  const dispatch = useDispatch();
   return (
     <div className='col-sm-9 padding-right'>
         <div className='features_item'>
@@ -33,7 +49,11 @@ const Home = () => {
                       <img src={`http://localhost/laravel8/public/upload/product/${item.id_user}/${firstImgae}`} alt={item.name}/>
                       <h2>${item.price}</h2>
                        <p>{item.name}</p>
-                      <a href='#' className="btn btn-default add-to-cart"> <i className="fa fa-shopping-cart"></i>Add to cart</a>
+                      <a href='#' className="btn btn-default add-to-cart" onClick={(e) => {
+                        e.preventDefault()
+                        dispatch(addToCart(item.id));
+                      }}> 
+                      <i className="fa fa-shopping-cart"></i>Add to cart</a>
                       {/* <a href="#" className="btn btn-default add-to-cart"  style={{ marginLeft: "5px" }}><i className="fa fa-eye"></i>
 												More
 											</a> */}
@@ -42,7 +62,10 @@ const Home = () => {
                     <div className="overlay-content">
                       <h2>${item.price}</h2>
                       <p>{item.name}</p>
-                      <a href="#" className="btn btn-default add-to-cart">
+                      <a href="#" className="btn btn-default add-to-cart"onClick={(e) => {
+                        e.preventDefault()
+                        dispatch(addToCart(item.id));
+                      }}> 
                         <i className="fa fa-shopping-cart"></i>
                         Add to cart
                       </a>
@@ -55,7 +78,10 @@ const Home = () => {
                    <div className="choose">
                      <ul className="nav nav-pills nav-justified">
                      <li>
-                      <a href="#">
+                      <a href="#" onClick={(e) => {
+                        e.preventDefault();
+                        handleWishlish(item.id)
+                      }}>
                         <i className="fa fa-plus-square"></i>
                         Add to wishlist
                       </a>

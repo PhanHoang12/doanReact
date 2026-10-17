@@ -1,12 +1,21 @@
 import React,{useState,useEffect, useContext} from 'react'
 import { useNavigate, NavLink, useLocation } from 'react-router-dom'
 import { CartContext } from '../../context/CartContext';
+import { WishlistContext } from '../../context/WishlistContext';
+import { useSelector } from "react-redux";
 
 const Head = () => {
 	 const navigate = useNavigate();
+
+	//  Sử dụng redux cho đếm số lượng thêm vào giỏ hàng 
+	 const checkoutCount = useSelector(
+    (state) => state.cart.cartCount);
+
 	 const location = useLocation();
 	 const [isLogin, setIsLogin] = useState(false)
 	 const { cartCount, setCartCount } = useContext(CartContext);
+
+	 const {wishlistCount} = useContext(WishlistContext)
 	 useEffect(()=>{
 		const token = localStorage.getItem("token")
 		if(token){
@@ -104,8 +113,18 @@ const Head = () => {
 									<li>
 										<NavLink to="/account"><i className="fa fa-user"></i>
 										</NavLink> Account</li>
-									<li><a href=""><i className="fa fa-star"></i> Wishlist</a></li>
-									<li><a href="checkout.html"><i className="fa fa-crosshairs"></i> Checkout</a></li>
+									<li>
+										<NavLink to="/wishlist">
+											<i className="fa fa-star"></i>
+											Wishlist ({wishlistCount})
+										</NavLink>
+									</li>
+									<li>
+										<NavLink to="/checkout">
+											<i className="fa fa-crosshairs"></i>
+											Checkout ({checkoutCount})
+										</NavLink>
+									</li>
 									<li>
 										<NavLink to="/product/cart">
 											<i className="fa fa-shopping-cart"></i>
