@@ -1,162 +1,162 @@
 # doanReact — E-Shopper Frontend
 
-Ứng dụng bán hàng viết bằng **React và JavaScript**, tích hợp REST API để hiển thị sản phẩm, quản lý sản phẩm của thành viên, cập nhật tài khoản và tương tác với blog. Dự án còn triển khai giỏ hàng, danh sách yêu thích và lưu trạng thái trên trình duyệt.
+An e-commerce frontend built with **React and JavaScript**, integrating a REST API to display products, manage members' products, update accounts, and interact with blog posts. The application also implements shopping carts, a wishlist, and browser storage persistence.
 
-Đây là đồ án frontend cá nhân phục vụ thực hành và giới thiệu năng lực khi ứng tuyển thực tập hoặc nhận việc freelance React. Những phần đáng xem trong mã nguồn gồm **CRUD sản phẩm có upload nhiều ảnh**, **form có kiểm tra dữ liệu**, **bình luận/phản hồi**, **đánh giá bài viết** và **quản lý trạng thái bằng Context/Redux Toolkit**.
+This personal frontend project provides practical experience and portfolio material for React internships and freelance work. Key implementation areas include **product CRUD with multiple image uploads**, **form validation**, **comments and replies**, **blog ratings**, and **state management with Context and Redux Toolkit**.
 
-> Phạm vi xác minh: mô tả dưới đây được đối chiếu trực tiếp với mã nguồn tại commit [`62a7dc0`](https://github.com/PhanHoang12/doanReact/commit/62a7dc0a1e287c5317b321d29c3fed4fafdac5d3). Các luồng gọi API cần backend Laravel riêng; repository này không chứa ứng dụng Laravel. Build và test hiện còn lỗi được ghi ở phần [Kết quả kiểm tra](#kết-quả-kiểm-tra), vì vậy chưa có xác nhận chạy thành công toàn bộ luồng trên trình duyệt.
+> Verification scope: the descriptions below were checked directly against the source code at commit [`62a7dc0`](https://github.com/PhanHoang12/doanReact/commit/62a7dc0a1e287c5317b321d29c3fed4fafdac5d3). API interactions require a separate Laravel backend, which is not included in this repository. The build and tests currently have the issues documented under [Verification results](#verification-results), so complete browser workflows have not yet been verified.
 
-## Chức năng đã có trong mã nguồn
+## Features implemented in the source code
 
-### 1. Danh sách và chi tiết sản phẩm
+### 1. Product listing and details
 
-- Trang chủ gọi `GET /product`, nhận danh sách từ `res.data.data` và xử lý cả trường hợp dữ liệu là mảng hoặc object. Mỗi thẻ hiển thị ảnh đầu tiên, tên, giá, liên kết chi tiết và thao tác thêm vào giỏ hàng/wishlist.
-- Trang chi tiết lấy ID từ URL bằng `useParams`, gọi `GET /product/detail/:id`, hiển thị thông tin sản phẩm, giá, mã web, trạng thái New/Sale, thông tin công ty và mô tả.
-- Danh sách ảnh được chuyển từ chuỗi JSON khi cần. Người dùng chọn ảnh nhỏ để đổi ảnh chính và nhập số lượng trước khi thêm vào giỏ hàng.
-- Nút thêm giỏ trên trang chủ dùng Redux; nút ở trang chi tiết dùng Context và một khóa lưu trữ khác. Hai luồng này được giải thích riêng bên dưới.
+- The home page calls `GET /product`, reads `res.data.data`, and handles responses containing either an array or an object. Each product card displays its first image, name, price, a details link, and actions to add it to the cart or wishlist.
+- The details page reads the product ID from the URL using `useParams`, calls `GET /product/detail/:id`, and displays product information, price, web ID, New/Sale status, company information, and description.
+- Image lists are parsed from JSON strings when needed. Users can select a thumbnail to change the main image and enter a quantity before adding the product to the cart.
+- The home page's add-to-cart action uses Redux, while the details page uses Context and a different storage key. Both flows are documented separately below.
 
-**Mã nguồn:** [Home.js](src/component/Home/Home.js), [ProductDetail.js](src/component/Product/ProductDetail.js).
+**Source:** [Home.js](src/component/Home/Home.js), [ProductDetail.js](src/component/Product/ProductDetail.js).
 
-### 2. Đăng ký, đăng nhập và cập nhật tài khoản
+### 2. Registration, login, and account updates
 
-- Đăng ký gồm tên, email, mật khẩu, điện thoại, địa chỉ và avatar. Form kiểm tra trường bắt buộc, định dạng email, đuôi ảnh `png/jpg/jpeg` và giới hạn dung lượng 1 MB. `FileReader` chuyển avatar sang Data URL để gửi cùng dữ liệu đăng ký.
-- Đăng nhập kiểm tra email/mật khẩu, gửi `POST /login` với `level: 0`, hiển thị lỗi từ API và lưu `Auth`/token vào `localStorage` khi thành công, sau đó chuyển về trang chủ.
-- Trang tài khoản điền sẵn dữ liệu từ `auth`; email ở chế độ chỉ đọc. Người dùng có thể gửi tên, mật khẩu, điện thoại, địa chỉ và avatar tới `POST /user/update/:id` với Bearer token. Phản hồi được dùng để cập nhật thông tin lưu trên trình duyệt.
-- Header kiểm tra token khi đường dẫn thay đổi để hiển thị menu đăng nhập hoặc tài khoản. Đăng xuất gọi `localStorage.clear()` và chuyển về trang đăng nhập; việc này cũng xóa dữ liệu giỏ hàng/wishlist đã lưu.
+- Registration collects a name, email, password, phone number, address, and avatar. The form validates required fields, email format, `png/jpg/jpeg` file extensions, and a 1 MB file size limit. `FileReader` converts the avatar to a Data URL for submission with the registration data.
+- Login validates the email and password, sends `POST /login` with `level: 0`, displays API validation errors, and stores the returned `Auth` data and token in `localStorage` on success before navigating to the home page.
+- The account page is prefilled from `auth`, with the email field set to read-only. Users can submit their name, password, phone number, address, and avatar to `POST /user/update/:id` with a Bearer token. The response updates the account information stored in the browser.
+- The header checks for a token when the route changes to display either the login or account menu. Logout calls `localStorage.clear()` and navigates to the login page, also removing saved cart and wishlist data.
 
-**Mã nguồn:** [Register.js](src/component/member/Register.js), [Login.js](src/component/member/Login.js), [Account.js](src/component/member/Account.js), [Head.js](src/component/layout/Head.js).
+**Source:** [Register.js](src/component/member/Register.js), [Login.js](src/component/member/Login.js), [Account.js](src/component/member/Account.js), [Head.js](src/component/layout/Head.js).
 
-### 3. Quản lý sản phẩm cá nhân: xem, thêm, sửa, xóa
+### 3. Personal product management: list, create, update, and delete
 
-Đây là nhóm chức năng thể hiện rõ cách xử lý form, dữ liệu API và file upload:
+This feature group demonstrates form handling, API integration, and file uploads:
 
-- **Xem:** lấy sản phẩm của thành viên qua `GET /user/my-product`, hiển thị bảng gồm ID, tên, ảnh, giá và thao tác sửa/xóa.
-- **Thêm:** tải category/brand từ API để tạo các lựa chọn; nhập tên, giá, công ty, danh mục, thương hiệu, trạng thái, mức sale và chi tiết. Trường phần trăm sale xuất hiện khi chọn Sale và được đặt về `0` khi chọn New.
-- **Kiểm tra ảnh:** form thêm cho chọn tối đa 3 ảnh, kiểm tra đuôi `png/jpg/jpeg` và giới hạn mỗi file 1 MB. Dữ liệu và ảnh được gửi bằng `FormData`, các file dùng trường `file[]`.
-- **Sửa:** lấy dữ liệu theo ID và điền vào form; hiển thị ảnh cũ để chọn xóa bằng checkbox. Khi cập nhật, gửi danh sách `avatarCheckBox[]` cùng `file[]` mới và kiểm tra tổng số ảnh còn lại không vượt quá 3. Form hiện yêu cầu ít nhất một ảnh mới ngay cả khi chỉ muốn sửa thông tin chữ.
-- **Xóa:** hỏi xác nhận bằng `window.confirm`, gọi endpoint xóa rồi cập nhật lại danh sách từ phản hồi của API. Endpoint hiện được gọi bằng `GET /user/product/delete/:id`.
-- Các request quản lý sản phẩm gửi Bearer token. Form thêm/sửa có phần hiển thị lỗi validation từ phản hồi API và chuyển về `/my-product` khi thành công.
+- **List:** fetches the member's products through `GET /user/my-product` and renders a table with IDs, names, images, prices, and edit/delete actions.
+- **Create:** loads category and brand options from the API. Users enter a name, price, company, category, brand, status, discount percentage, and description. The discount field appears when Sale is selected and resets to `0` when New is selected.
+- **Image validation:** the create form allows up to 3 images, checks `png/jpg/jpeg` extensions, and applies a 1 MB limit per file. Product data and images are submitted using `FormData`, with files under `file[]`.
+- **Update:** loads a product by ID and fills the form, displaying existing images with checkboxes for removal. Updates submit the `avatarCheckBox[]` removal list alongside new `file[]` uploads and validate that the remaining image count does not exceed 3. The form currently requires at least one new image, even for text-only changes.
+- **Delete:** requests confirmation with `window.confirm`, calls the deletion endpoint, and refreshes the displayed list from the API response. The current request uses `GET /user/product/delete/:id`.
+- Product management requests include a Bearer token. Create/update forms display API validation errors and navigate to `/my-product` on success.
 
-**Mã nguồn:** [MyProduct.js](src/component/Product/MyProduct.js), [AddProduct.js](src/component/Product/AddProduct.js), [EditProduct .js](src/component/Product/EditProduct%20.js).
+**Source:** [MyProduct.js](src/component/Product/MyProduct.js), [AddProduct.js](src/component/Product/AddProduct.js), [EditProduct .js](src/component/Product/EditProduct%20.js).
 
-### 4. Giỏ hàng và màn hình checkout
+### 4. Shopping carts and checkout screen
 
-Hiện có **hai cách triển khai giỏ hàng cùng tồn tại**, chưa đồng bộ với nhau:
+There are currently **two separate cart implementations**, which are not synchronized:
 
-| Luồng | Cách lưu và chia sẻ state | Hành vi có trong mã nguồn |
+| Flow | Storage and shared state | Implemented behavior |
 | --- | --- | --- |
-| Chi tiết sản phẩm → `/product/cart` | `localStorage.Cart` lưu object `{ productId: quantity }`; `CartContext` chia sẻ tổng số lượng cho header | Thêm số lượng từ trang chi tiết; lấy thông tin sản phẩm qua `POST /product/cart`; tăng/giảm số lượng, giữ tối thiểu 1 khi bấm giảm, xác nhận xóa, tính thành tiền từng dòng và tổng giỏ |
-| Trang chủ → `/checkout` | Redux Toolkit lưu `items` và `cartCount`; khôi phục/lưu bằng `localStorage.ReduxCart` | Dispatch `addToCart`, tăng/giảm qua `cong`/`tru`, cập nhật bộ đếm Checkout trên header; gọi lại API khi `items` đổi; tính tổng tiền từ giá và số lượng |
+| Product details → `/product/cart` | `localStorage.Cart` stores a `{ productId: quantity }` object; `CartContext` shares the total quantity with the header | Adds quantities from the details page; fetches product information through `POST /product/cart`; supports increment/decrement actions, a minimum of 1 when decrementing, deletion with confirmation, line totals, and a cart total |
+| Home page → `/checkout` | Redux Toolkit stores `items` and `cartCount`, restored from and persisted to `localStorage.ReduxCart` | Dispatches `addToCart`, adjusts quantities with `cong`/`tru`, updates the header's Checkout counter, refetches product information when `items` changes, and calculates totals from prices and quantities |
 
-Ở checkout, phần tổng kết cộng thêm **$2 thuế cố định**, phí vận chuyển hiển thị Free. Biểu mẫu thông tin người mua, địa chỉ giao hàng và checkbox phương thức thanh toán hiện là giao diện; chưa có xử lý gửi đơn hàng, lưu lịch sử đơn hoặc tích hợp cổng thanh toán.
+The checkout summary adds a **fixed $2 tax** and displays free shipping. The shopper information forms, shipping address fields, and payment method checkboxes are currently UI elements; order submission, order history storage, and payment gateway integration are not implemented.
 
-**Mã nguồn:** [CartContext.js](src/context/CartContext.js), [Cart.js](src/component/Product/Cart.js), [cartSlice.js](src/redux/cartSlice.js), [Checkout.js](src/component/Product/Checkout.js).
+**Source:** [CartContext.js](src/context/CartContext.js), [Cart.js](src/component/Product/Cart.js), [cartSlice.js](src/redux/cartSlice.js), [Checkout.js](src/component/Product/Checkout.js).
 
-### 5. Danh sách yêu thích
+### 5. Wishlist
 
-- Lưu mảng ID trong `localStorage.Wishlist`; kiểm tra `includes` để tránh thêm trùng ID.
-- Trang `/wishlist` lấy danh sách sản phẩm từ API rồi lọc theo những ID đã lưu.
-- Xóa một mục sẽ cập nhật cả danh sách đang hiển thị, `localStorage` và bộ đếm ở header thông qua `WishlistContext`.
+- Stores an array of product IDs in `localStorage.Wishlist`, using `includes` to prevent duplicate IDs.
+- The `/wishlist` page fetches products from the API and filters them by the saved IDs.
+- Removing an item updates the displayed list, `localStorage`, and the header counter through `WishlistContext`.
 
-**Mã nguồn:** [Home.js](src/component/Home/Home.js), [Wishlist.js](src/component/Product/Wishlist.js), [WishlistContext.js](src/context/WishlistContext.js).
+**Source:** [Home.js](src/component/Home/Home.js), [Wishlist.js](src/component/Product/Wishlist.js), [WishlistContext.js](src/context/WishlistContext.js).
 
-### 6. Blog, bình luận/phản hồi và đánh giá sao
+### 6. Blog posts, comments, replies, and star ratings
 
-- Danh sách blog gọi `GET /blog`, hiển thị tiêu đề, ảnh, mô tả, ID tác giả, ngày/giờ theo `vi-VN` và liên kết chi tiết. Chi tiết gọi `GET /blog/detail/:id` và render nội dung HTML từ API.
-- `BlogDetail` được tách thành các phần `CommentSection`, `CommentItem` và `Rate` để chia trách nhiệm hiển thị và xử lý tương tác.
-- Bình luận yêu cầu token và thông tin `auth`; người chưa đăng nhập được chuyển tới trang đăng nhập. Nội dung trống sau `trim()` bị chặn trước khi gửi.
-- Bình luận gốc có `id_comment = 0`; phản hồi mang ID bình luận cha. Giao diện hiển thị một cấp phản hồi dưới bình luận gốc, có form trả lời ngay tại mục được chọn.
-- Sau `POST /blog/comment/:id` thành công, phản hồi mới được nối vào state và form được làm trống, không tải lại toàn trang.
-- `Rate` lấy danh sách đánh giá qua `GET /blog/rate/:id`, tính điểm trung bình bằng `reduce` và hiển thị số lượt đánh giá. Khi người đã đăng nhập chọn sao, component gửi `POST` và tải lại danh sách đánh giá để cập nhật giao diện.
+- The blog list calls `GET /blog` and displays titles, images, descriptions, author IDs, dates and times formatted with `vi-VN`, and links to post details. The details page calls `GET /blog/detail/:id` and renders HTML content returned by the API.
+- `BlogDetail` is split into `CommentSection`, `CommentItem`, and `Rate` components to separate display and interaction responsibilities.
+- Posting a comment requires a token and `auth` data; users who are not logged in are redirected to the login page. Comments that are empty after `trim()` are rejected before submission.
+- Top-level comments use `id_comment = 0`; replies store the parent comment's ID. The UI displays one level of replies beneath each top-level comment and provides an inline reply form for the selected comment.
+- After a successful `POST /blog/comment/:id`, the returned comment is appended to state and the form is cleared without reloading the page.
+- `Rate` fetches ratings through `GET /blog/rate/:id`, calculates the average using `reduce`, and displays the vote count. When a logged-in user selects a star rating, the component submits a `POST` request and fetches the ratings again to update the UI.
 
-**Mã nguồn:** [Blog.js](src/component/Blog/Blog.js), [BlogDetail.js](src/component/Blog/BlogDetail.js), [CommentSection.js](src/component/Blog/CommentSection.js), [CommentItem.js](src/component/Blog/CommentItem.js), [Rate.js](src/component/Blog/Rate.js).
+**Source:** [Blog.js](src/component/Blog/Blog.js), [BlogDetail.js](src/component/Blog/BlogDetail.js), [CommentSection.js](src/component/Blog/CommentSection.js), [CommentItem.js](src/component/Blog/CommentItem.js), [Rate.js](src/component/Blog/Rate.js).
 
-## Năng lực thể hiện qua triển khai
+## Skills demonstrated by the implementation
 
-| Năng lực | Dẫn chứng có thể kiểm tra trong code |
+| Skill | Evidence in the code |
 | --- | --- |
-| Tích hợp REST API | Axios instance dùng chung tại [API.js](src/api/API.js); các component lấy dữ liệu, xử lý phản hồi, cập nhật state và gửi Bearer token ở request cần tài khoản |
-| Xây dựng form có tương tác | Controlled inputs, object lỗi theo từng trường, kiểm tra email/file, trường sale thay đổi theo trạng thái trong [AddProduct.js](src/component/Product/AddProduct.js) |
-| Xử lý upload nhiều ảnh | Dùng `FormData`, `file[]`, danh sách ảnh cũ cần xóa và phép tính số ảnh còn lại trong [EditProduct .js](src/component/Product/EditProduct%20.js) |
-| Tổ chức component | Tách layout dùng chung; `BlogDetail` truyền dữ liệu và callback cho các component bình luận/đánh giá; [MemberLeft.js](src/component/member/MemberLeft.js) dùng lại trong các trang thành viên |
-| Chia sẻ và lưu trạng thái | Context cho bộ đếm giỏ/wishlist, Redux Toolkit cho luồng giỏ ở trang chủ/checkout, `localStorage` để khôi phục dữ liệu khi tải lại |
-| Xử lý dữ liệu JavaScript | Chuẩn hóa danh sách object/mảng, parse ảnh JSON, lọc wishlist, nhóm bình luận theo ID cha, tính trung bình đánh giá và tổng tiền |
-| Điều hướng ứng dụng | Khai báo route trong [index.js](src/index.js), dùng `useParams` lấy ID, `useNavigate` chuyển trang sau thao tác và `NavLink` liên kết các màn hình |
+| REST API integration | Shared Axios instance in [API.js](src/api/API.js); components fetch data, handle responses, update state, and attach Bearer tokens to requests requiring an account |
+| Interactive forms | Controlled inputs, field-specific error objects, email/file checks, and a discount field driven by product status in [AddProduct.js](src/component/Product/AddProduct.js) |
+| Multiple image uploads | `FormData`, `file[]`, a list of existing images to remove, and remaining-image count calculations in [EditProduct .js](src/component/Product/EditProduct%20.js) |
+| Component organization | Shared layout components; `BlogDetail` passes data and callbacks to comment/rating components; [MemberLeft.js](src/component/member/MemberLeft.js) is reused across member pages |
+| Shared and persistent state | Context for cart/wishlist counters, Redux Toolkit for the home/checkout cart flow, and `localStorage` to restore data after a page reload |
+| JavaScript data handling | Normalizing objects and arrays, parsing image JSON, filtering wishlist items, grouping comments by parent ID, and calculating average ratings and monetary totals |
+| Application routing | Routes in [index.js](src/index.js), `useParams` for IDs, `useNavigate` after actions, and `NavLink` for screen navigation |
 
-Lịch sử commit cho thấy các phần được bổ sung theo từng bước, có thể dùng để trao đổi về quá trình triển khai khi phỏng vấn:
+The commit history records the features being added in stages and provides concrete material for discussing the development process in interviews:
 
-- [`ff64bbc`](https://github.com/PhanHoang12/doanReact/commit/ff64bbc): blog và chi tiết blog.
-- [`9725e6f`](https://github.com/PhanHoang12/doanReact/commit/9725e6f), [`da31876`](https://github.com/PhanHoang12/doanReact/commit/da31876): đăng nhập/đăng ký và bình luận.
-- [`8ce1e30`](https://github.com/PhanHoang12/doanReact/commit/8ce1e30): đánh giá, cập nhật thành viên và sản phẩm cá nhân.
-- [`9637920`](https://github.com/PhanHoang12/doanReact/commit/9637920), [`a49fc17`](https://github.com/PhanHoang12/doanReact/commit/a49fc17): hiển thị, thêm và sửa sản phẩm.
-- [`60e8b64`](https://github.com/PhanHoang12/doanReact/commit/60e8b64), [`2649ec3`](https://github.com/PhanHoang12/doanReact/commit/2649ec3): giỏ hàng, tăng/giảm và xóa.
-- [`62a7dc0`](https://github.com/PhanHoang12/doanReact/commit/62a7dc0): wishlist và tích hợp Redux.
+- [`ff64bbc`](https://github.com/PhanHoang12/doanReact/commit/ff64bbc): blog listing and details.
+- [`9725e6f`](https://github.com/PhanHoang12/doanReact/commit/9725e6f), [`da31876`](https://github.com/PhanHoang12/doanReact/commit/da31876): login/registration and comments.
+- [`8ce1e30`](https://github.com/PhanHoang12/doanReact/commit/8ce1e30): ratings, account updates, and personal products.
+- [`9637920`](https://github.com/PhanHoang12/doanReact/commit/9637920), [`a49fc17`](https://github.com/PhanHoang12/doanReact/commit/a49fc17): product listing, creation, and editing.
+- [`60e8b64`](https://github.com/PhanHoang12/doanReact/commit/60e8b64), [`2649ec3`](https://github.com/PhanHoang12/doanReact/commit/2649ec3): cart functionality, quantity changes, and removal.
+- [`62a7dc0`](https://github.com/PhanHoang12/doanReact/commit/62a7dc0): wishlist and Redux integration.
 
-### Phạm vi triển khai và giao diện tham khảo
+### Implementation scope and template attribution
 
-Giao diện sử dụng bộ HTML/CSS **E-Shopper**, có dòng ghi nguồn thiết kế Themeum trong [Foot.js](src/component/layout/Foot.js). Thư mục `frontend/` chứa các trang HTML và tài nguyên mẫu; phần ứng dụng React nằm ở `src/`, sử dụng tài nguyên tĩnh trong `public/`.
+The interface uses the **E-Shopper** HTML/CSS template, with Themeum credited in [Foot.js](src/component/layout/Foot.js). The `frontend/` directory contains the reference HTML pages and template assets; the React application lives in `src/` and uses static assets from `public/`.
 
-Phần có thể đánh giá về lập trình trong repository là logic React, kết nối API, validation, xử lý ảnh, điều hướng và quản lý state được dẫn chứng ở trên. Backend Laravel và thiết kế giao diện gốc nằm ngoài phạm vi này. Mã nguồn và lịch sử commit cung cấp nội dung cụ thể để tác giả trình bày cách tự triển khai và giải quyết vấn đề khi trao đổi với nhà tuyển dụng hoặc khách hàng.
+The programming work available for review includes the React logic, API integration, validation, image handling, routing, and state management referenced above. The Laravel backend and original interface design are outside this scope. The source and commit history provide specific examples the author can use to explain independent implementation and problem-solving to recruiters or clients.
 
-## Công nghệ và cấu trúc
+## Technology and structure
 
-Các phiên bản dưới đây theo [package.json](package.json); phiên bản cài đặt cụ thể được lưu trong [package-lock.json](package-lock.json).
+Versions below reflect [package.json](package.json); exact resolved versions are recorded in [package-lock.json](package-lock.json).
 
-| Công nghệ | Phiên bản khai báo | Vai trò |
+| Technology | Declared version | Purpose |
 | --- | --- | --- |
-| React / React DOM | `^19.3.0` | Component, hooks và render giao diện |
-| React Router DOM | `^7.18.4` | Điều hướng và URL có tham số |
-| Redux Toolkit / React Redux | `^2.13.0` / `^9.3.0` | State giỏ hàng cho trang chủ/checkout |
-| Axios | `^1.20.0` | Gửi HTTP request tới API Laravel |
-| react-simple-star-rating | `^5.1.7` | Giao diện đánh giá sao |
-| react-scripts | `5.0.1` | Lệnh phát triển, build và test của Create React App |
-| Bootstrap, Font Awesome, CSS E-Shopper | File tĩnh trong `public/` | Bố cục, biểu tượng và giao diện |
+| React / React DOM | `^19.3.0` | Components, hooks, and UI rendering |
+| React Router DOM | `^7.18.4` | Routing and URL parameters |
+| Redux Toolkit / React Redux | `^2.13.0` / `^9.3.0` | Cart state for the home/checkout flow |
+| Axios | `^1.20.0` | HTTP requests to the Laravel API |
+| react-simple-star-rating | `^5.1.7` | Star rating UI |
+| react-scripts | `5.0.1` | Create React App development, build, and test commands |
+| Bootstrap, Font Awesome, E-Shopper CSS | Static files in `public/` | Layout, icons, and styling |
 
 ```text
 doanReact/
-├── frontend/                 # HTML/CSS/JS và ảnh giao diện tham khảo
-├── public/                   # index.html, CSS, font, ảnh và JS tĩnh
+├── frontend/                 # Reference HTML/CSS/JS and template images
+├── public/                   # index.html, CSS, fonts, images, and static JS
 ├── src/
-│   ├── api/API.js            # Axios instance và địa chỉ backend
+│   ├── api/API.js            # Axios instance and backend address
 │   ├── component/
-│   │   ├── Home/             # Danh sách sản phẩm
-│   │   ├── Product/          # CRUD, chi tiết, giỏ, checkout, wishlist
-│   │   ├── member/           # Đăng nhập, đăng ký, cập nhật tài khoản
-│   │   ├── Blog/             # Bài viết, bình luận, phản hồi, đánh giá
-│   │   └── layout/           # Header, footer, menu bên trái
-│   ├── context/              # Bộ đếm Cart và Wishlist
-│   ├── redux/                # Store và cart slice
-│   ├── App.js                # Layout dùng chung, nhận nội dung qua children
-│   └── index.js              # Router và các provider
+│   │   ├── Home/             # Product listing
+│   │   ├── Product/          # CRUD, details, carts, checkout, wishlist
+│   │   ├── member/           # Login, registration, account updates
+│   │   ├── Blog/             # Posts, comments, replies, ratings
+│   │   └── layout/           # Header, footer, sidebar
+│   ├── context/              # Cart and Wishlist counters
+│   ├── redux/                # Store and cart slice
+│   ├── App.js                # Shared layout receiving content via children
+│   └── index.js              # Router and providers
 ├── package.json
 ├── package-lock.json
 └── README.md
 ```
 
-## Các trang / đường dẫn
+## Pages and routes
 
-Các đường dẫn sau được khai báo thực tế trong [src/index.js](src/index.js). Một số menu mẫu vẫn dùng liên kết `.html`; khi kiểm tra có thể truy cập trực tiếp route React tương ứng.
+The following routes are declared in [src/index.js](src/index.js). Some template menu items still use `.html` links; the corresponding React routes can be opened directly during verification.
 
-| Đường dẫn | Nội dung |
+| Route | Content |
 | --- | --- |
-| `/` | Danh sách sản phẩm, thêm vào giỏ Redux và wishlist |
-| `/product/detail/:id` | Chi tiết, đổi ảnh chính, thêm vào giỏ Context |
-| `/product/cart` | Giỏ Context: số lượng, xóa, thành tiền |
-| `/checkout` | Giỏ Redux, tổng kết tiền và giao diện checkout |
-| `/wishlist` | Danh sách sản phẩm yêu thích |
-| `/member/login-register` | Hai form đăng nhập và đăng ký |
-| `/account` | Cập nhật tài khoản |
-| `/my-product` | Danh sách sản phẩm của thành viên |
-| `/user/product/add` | Thêm sản phẩm |
-| `/user/product/edit/:id` | Sửa sản phẩm và ảnh |
-| `/blog` | Danh sách bài viết |
-| `/blog/detail/:id` | Nội dung bài, bình luận/phản hồi và đánh giá |
+| `/` | Product listing, Redux add-to-cart action, and wishlist action |
+| `/product/detail/:id` | Product details, main image selection, and Context add-to-cart action |
+| `/product/cart` | Context cart: quantities, removal, and totals |
+| `/checkout` | Redux cart, order summary, and checkout UI |
+| `/wishlist` | Saved favorite products |
+| `/member/login-register` | Login and registration forms |
+| `/account` | Account updates |
+| `/my-product` | Member's product list |
+| `/user/product/add` | Product creation |
+| `/user/product/edit/:id` | Product and image editing |
+| `/blog` | Blog listing |
+| `/blog/detail/:id` | Post content, comments/replies, and ratings |
 
-## Cài đặt và kết nối backend
+## Setup and backend connection
 
 ### Frontend
 
-Cần Git, Node.js và npm. Dependency React Router đang cài yêu cầu Node.js từ 20 trở lên. Môi trường thực hiện kiểm tra tài liệu: **Node.js 22.20.0, npm 11.19.0, Windows PowerShell**.
+Git, Node.js, and npm are required. The installed React Router dependency requires Node.js 20 or later. The documentation verification environment was **Node.js 22.20.0, npm 11.19.0, and Windows PowerShell**.
 
 ```bash
 git clone https://github.com/PhanHoang12/doanReact.git
@@ -165,61 +165,61 @@ npm ci
 npm start
 ```
 
-`npm ci` dùng lockfile có sẵn. Dev server mặc định ở `http://localhost:3000`. Trên PowerShell chặn thực thi `npm.ps1`, dùng `npm.cmd` thay cho `npm`.
+`npm ci` uses the existing lockfile. The development server defaults to `http://localhost:3000`. If PowerShell blocks `npm.ps1`, use `npm.cmd` in place of `npm`.
 
-### Backend và ảnh upload
+### Backend and uploaded images
 
-[src/api/API.js](src/api/API.js) đang đặt cố định:
+[src/api/API.js](src/api/API.js) currently has a hardcoded backend address:
 
 ```js
 baseURL: 'http://localhost/laravel8/public/api'
 ```
 
-Cần một backend Laravel riêng cung cấp các endpoint bên dưới và cho phép frontend gọi API qua CORS. Repo không kèm database, migration, tài khoản mẫu hoặc hướng dẫn khởi tạo backend đó.
+A separate Laravel backend must provide the endpoints below and allow frontend API requests through CORS. This repository does not include that backend's database, migrations, sample accounts, or setup instructions.
 
-Ảnh upload được tham chiếu trực tiếp tới `http://localhost/laravel8/public/upload/` theo các thư mục `product/{id_user}/{filename}`, `Blog/image/{filename}` và `user/avatar/{filename}`. Nếu dùng host khác, cần sửa cả `baseURL` lẫn URL ảnh trong các component; hiện chưa có biến môi trường để cấu hình chung.
+Uploaded images are referenced directly under `http://localhost/laravel8/public/upload/`, using `product/{id_user}/{filename}`, `Blog/image/{filename}`, and `user/avatar/{filename}`. To use another host, update both `baseURL` and the image URLs in the components; there is currently no shared environment-variable configuration for these addresses.
 
-### API contract được frontend sử dụng
+### API contract used by the frontend
 
-Đây là danh sách request đọc từ code, chưa phải kết quả kiểm thử backend.
+This inventory is based on requests in the source code, not backend test results.
 
-| Phương thức | Endpoint (sau `baseURL`) | Dữ liệu / mục đích |
+| Method | Endpoint (relative to `baseURL`) | Data / purpose |
 | --- | --- | --- |
-| `GET` | `/product`, `/product/detail/:id` | Danh sách / chi tiết sản phẩm trong `data` |
-| `POST` | `/product/cart` | Gửi object ID → số lượng, nhận thông tin sản phẩm trong `data` |
-| `GET` | `/category-brand` | Nhận hai danh sách `category` và `brand` |
-| `POST` | `/register`, `/login` | Đăng ký / đăng nhập; luồng login đọc `Auth` và `token` |
-| `POST` | `/user/update/:id` | Cập nhật tài khoản với Bearer token |
-| `GET` | `/user/my-product`, `/user/product/:id` | Danh sách / dữ liệu sửa sản phẩm với Bearer token |
-| `POST` | `/user/product/add`, `/user/product/update/:id` | `FormData` và Bearer token; lỗi form đọc từ `errors` |
-| `GET` | `/user/product/delete/:id` | Xóa sản phẩm với Bearer token |
-| `GET` | `/blog`, `/blog/detail/:id` | Danh sách trong `blog.data`; chi tiết trong `data`, gồm `comment` |
-| `POST` | `/blog/comment/:id` | Nội dung, ID người dùng, ID cha, avatar và Bearer token; nhận bình luận mới trong `data` |
-| `GET`, `POST` | `/blog/rate/:id` | Lấy đánh giá / gửi `user_id`, `blog_id`, `rate` với Bearer token |
+| `GET` | `/product`, `/product/detail/:id` | Product listing / details in `data` |
+| `POST` | `/product/cart` | Sends an ID → quantity object; receives product information in `data` |
+| `GET` | `/category-brand` | Receives `category` and `brand` lists |
+| `POST` | `/register`, `/login` | Registration / login; the login flow reads `Auth` and `token` |
+| `POST` | `/user/update/:id` | Account updates with a Bearer token |
+| `GET` | `/user/my-product`, `/user/product/:id` | Product list / editing data with a Bearer token |
+| `POST` | `/user/product/add`, `/user/product/update/:id` | `FormData` and a Bearer token; form errors are read from `errors` |
+| `GET` | `/user/product/delete/:id` | Product deletion with a Bearer token |
+| `GET` | `/blog`, `/blog/detail/:id` | List in `blog.data`; details in `data`, including `comment` |
+| `POST` | `/blog/comment/:id` | Content, user ID, parent ID, avatar, and a Bearer token; receives the new comment in `data` |
+| `GET`, `POST` | `/blog/rate/:id` | Fetches ratings / submits `user_id`, `blog_id`, and `rate` with a Bearer token |
 
-## Kết quả kiểm tra
+## Verification results
 
-Kiểm tra ngày **16/11/2026**, trên mã nguồn ứng dụng không thay đổi so với `62a7dc0`, với các dependency sẵn có trong workspace:
+Checked on **16 November 2026**, with application source unchanged from `62a7dc0` and dependencies already installed in the workspace:
 
-| Lệnh | Kết quả thực tế |
+| Command | Observed result |
 | --- | --- |
-| `npm.cmd run build` | **Chưa thành công:** `Attempted import error: 'React' is not exported from 'react' (imported as 'React').` Các file Login, Register và Rate có cách import named `React` cần được sửa trước khi kiểm tra tiếp. |
-| `$env:CI = 'true'; npm.cmd test -- --watchAll=false --runInBand` | **Chưa thành công:** Jest không tìm được module `react-router/dom` từ `react-router-dom/dist/index.js`; 1 test suite lỗi trước khi chạy test. |
+| `npm.cmd run build` | **Failed:** `Attempted import error: 'React' is not exported from 'react' (imported as 'React').` Login, Register, and Rate use a named `React` import that needs to be corrected before further build verification. |
+| `$env:CI = 'true'; npm.cmd test -- --watchAll=false --runInBand` | **Failed:** Jest cannot resolve `react-router/dom` from `react-router-dom/dist/index.js`; 1 test suite fails before any tests execute. |
 
-[App.test.js](src/App.test.js) vẫn là test mẫu tìm chữ “learn react”, chưa phù hợp giao diện hiện tại và chưa bọc các provider mà ứng dụng sử dụng. Repo chưa có test nghiệp vụ cho CRUD, giỏ hàng hoặc bình luận. Chưa thực hiện kiểm thử end-to-end với backend, kiểm tra responsive trên thiết bị hay xác minh demo công khai; tài liệu này không kèm ảnh chụp runtime.
+[App.test.js](src/App.test.js) still contains the starter test looking for “learn react,” which does not match the current interface and does not wrap the component in the providers the application uses. There are no feature tests for product CRUD, carts, or comments. End-to-end testing with the backend, responsive checks on devices, and a public demo have not been verified; runtime screenshots are not included in this documentation.
 
-## Giới hạn hiện tại và hướng phát triển
+## Current limitations and next steps
 
-- Sửa lỗi build và môi trường Jest, thay test mẫu bằng các kiểm tra nghiệp vụ phù hợp.
-- Hợp nhất `Cart` và `ReduxCart` thành một nguồn state. Hiện thêm từ trang chủ không đưa sản phẩm vào `/product/cart`, và thêm từ chi tiết không đưa sản phẩm vào `/checkout`.
-- Hoàn thiện đặt hàng/thanh toán. Redux cart chưa có action xóa; biểu mẫu checkout và phương thức thanh toán chưa nối nghiệp vụ.
-- Bổ sung bảo vệ route thành viên và đồng bộ state khi đăng xuất. Hiện header chỉ kiểm tra sự có mặt của token; `localStorage.clear()` chưa reset Redux cart và bộ đếm wishlist đang giữ trong bộ nhớ.
-- Cải thiện validation số lượng, giá và phần trăm sale; thêm trạng thái loading, giỏ trống và thông báo lỗi mạng trên giao diện. Nhiều lỗi request hiện chỉ được ghi ra console.
-- Nối nghiệp vụ cho tìm kiếm, lọc danh mục/brand, so sánh sản phẩm và phân trang blog; các phần này hiện là giao diện mẫu. Contact/404 có trong bộ HTML nhưng chưa được khai báo thành route React.
-- Đưa API/URL ảnh về cấu hình chung, hoàn thiện liên kết menu, kiểm tra mobile, bổ sung ảnh chụp và demo sau khi chạy ổn định.
+- Fix the build and Jest setup, and replace the starter test with relevant feature tests.
+- Consolidate `Cart` and `ReduxCart` into one state source. Currently, adding from the home page does not populate `/product/cart`, and adding from product details does not populate `/checkout`.
+- Complete order submission and payment handling. The Redux cart has no remove action; checkout forms and payment choices are not connected to order processing.
+- Add route protection for member pages and synchronize in-memory state on logout. The header currently checks only for token presence; `localStorage.clear()` does not reset the Redux cart or the wishlist counter held in memory.
+- Improve quantity, price, and discount validation; add loading states, empty-cart states, and visible network error messages. Many request errors are currently logged only to the console.
+- Implement search, category/brand filtering, product comparison, and blog pagination; these currently remain template UI. Contact/404 pages exist in the HTML template but are not declared as React routes.
+- Centralize API/image URL configuration, complete menu navigation, test mobile layouts, and add screenshots and a demo once the application runs reliably.
 
-## Tác giả và ghi nguồn
+## Author and attribution
 
 - GitHub: [PhanHoang12](https://github.com/PhanHoang12).
-- Giao diện tham khảo: E-Shopper, có ghi nguồn Themeum trong footer; giữ phần ghi nguồn khi sử dụng tài nguyên mẫu.
-- Repository hiện chưa có file `LICENSE` riêng.
+- Interface template: E-Shopper, with Themeum credited in the footer; retain attribution when using the template assets.
+- This repository currently has no separate `LICENSE` file.
